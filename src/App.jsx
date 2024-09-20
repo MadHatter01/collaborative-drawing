@@ -1,6 +1,4 @@
 import { useState, useRef } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
@@ -52,16 +50,29 @@ function App() {
   const handleBrushType = (e)=>{
     setBrushType(e.target.value);
   }
+
+
+  const clearCanvas = ()=>{
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
   return (
   
   <div className='container'>
 
    <div className='canvasActions'>
+   <div className='form-element'>
+    <label htmlFor={brushOpacity}>Brush Opacity</label><input type="range" id="brushSize" name="brushSize" min="0.1" max="1" value={brushOpacity} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
+    </div>
     <div className='form-element'>
     <label htmlFor={brushSize}>Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
     </div>
     <div className='form-element'>
     <label htmlFor={brushType}>Brush Type</label><select id="brushType" name="brushType" value={brushType} onChange={handleBrushType}> <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
+    </div>
+    <div className='form-element'>
+      <button onClick={clearCanvas}>Clear Canvas</button>
     </div>
     </div>
     <canvas ref={canvasRef} width="800px" height="800px"  onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}/>
