@@ -6,6 +6,8 @@ import './App.css'
 function App() {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
+  const [brushSize, setBrushSize] = useState(4);
+  
 
 
   const handleMouseDown = (e)=>{
@@ -24,6 +26,7 @@ function App() {
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    ctx.lineWidth = brushSize;
     ctx.lineTo(e.clientX-canvas.offsetLeft, e.clientY-canvas.offsetTop);
     ctx.stroke();
   }
@@ -32,8 +35,16 @@ function App() {
     setDrawing(false);
   }
 
+  const handleBrushSize = (e)=>{
+    setBrushSize(Number(e.target.value));
+  }
+
   return (
-   <div>
+  
+  <div className='container'>
+   <div className='canvasActions'>
+    <label htmlFor={brushSize}>Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} />
+    </div>
     <canvas ref={canvasRef} width="800px" height="800px"  onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}/>
    </div>
   )
