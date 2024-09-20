@@ -6,6 +6,7 @@ function App() {
   const [drawing, setDrawing] = useState(false);
   const [brushSize, setBrushSize] = useState(4);
   const [brushType, setBrushType] = useState('solid');
+  const [brushOpacity, setBrushOpacity] = useState(1);
 
 
   const handleMouseDown = (e)=>{
@@ -24,6 +25,8 @@ function App() {
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    ctx.globalAlpha = brushOpacity/10;
+    console.log(ctx.globalAlpha)
     if (brushType === 'solid'){
       ctx.setLineDash([]);
     }
@@ -34,7 +37,9 @@ function App() {
       ctx.setLineDash([2,8]);
     }
     ctx.lineWidth = brushSize;
+   
     ctx.lineTo(e.clientX-canvas.offsetLeft, e.clientY-canvas.offsetTop);
+
     ctx.strokeStyle = '#ffffff'
     ctx.stroke();
   }
@@ -51,6 +56,10 @@ function App() {
     setBrushType(e.target.value);
   }
 
+  const handleBrushOpacity = (e)=>{
+    setBrushOpacity(Number(e.target.value)/10);
+  }
+
 
   const clearCanvas = ()=>{
     const canvas = canvasRef.current;
@@ -63,13 +72,13 @@ function App() {
 
    <div className='canvasActions'>
    <div className='form-element'>
-    <label htmlFor={brushOpacity}>Brush Opacity</label><input type="range" id="brushSize" name="brushSize" min="0.1" max="1" value={brushOpacity} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
+    <label htmlFor="brushOpacity">Brush Opacity</label><input type="range" id="brushOpacity" name="brushOpacity" min="1" max="10" value={brushOpacity*10} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
     </div>
     <div className='form-element'>
-    <label htmlFor={brushSize}>Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
+    <label htmlFor="brushSize">Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
     </div>
     <div className='form-element'>
-    <label htmlFor={brushType}>Brush Type</label><select id="brushType" name="brushType" value={brushType} onChange={handleBrushType}> <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
+    <label htmlFor="brushType">Brush Type</label><select id="brushType" name="brushType" value={brushType} onChange={handleBrushType}> <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
     </div>
     <div className='form-element'>
       <button onClick={clearCanvas}>Clear Canvas</button>
