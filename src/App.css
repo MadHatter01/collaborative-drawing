@@ -9,7 +9,13 @@
   display:flex;
   margin:2rem;
 }
+.form-element{
+  margin: 0 2rem;
+}
 
+.form-element label{
+  padding: 0 0.5rem;
+}
 canvas{
   border: 1px solid #555;
 }
