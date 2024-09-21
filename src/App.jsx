@@ -9,87 +9,111 @@ function App() {
   const [brushSize, setBrushSize] = useState(4);
   const [brushType, setBrushType] = useState('solid');
   const [brushOpacity, setBrushOpacity] = useState(1);
+  const lastPosRef = useRef({ x: 0, y: 0 });
 
 
-  const handleMouseDown = (e)=>{
+  const handleMouseDown = (e) => {
     setDrawing(true);
-    console.log(`mouse pos ${e.clientX}, ${e.clientY}`);
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.beginPath();
-    ctx.moveTo(e.clientX-canvas.offsetLeft, e.clientY-canvas.offsetTop);
+    const { offsetX, offsetY } = e.nativeEvent;
+    lastPosRef.current = { x: offsetX, y: offsetY };
   }
 
-  const handleMouseMove = (e)=>{
-    if (!drawing){
-      return
-    }
-
+  const draw = (x0, y0, x1, y1, size, type, opacity, emit) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    ctx.globalAlpha = brushOpacity/10;
-    console.log(ctx.globalAlpha)
-    if (brushType === 'solid'){
+    ctx.globalAlpha = opacity;
+    if (type === 'solid') {
       ctx.setLineDash([]);
     }
-    else if(brushType === 'dashed'){
-      ctx.setLineDash([15,15]);
+    else if (type === 'dashed') {
+      ctx.setLineDash([15, 15]);
     }
-    else if(brushType === 'dotted'){
-      ctx.setLineDash([2,8]);
+    else if (type === 'dotted') {
+      ctx.setLineDash([2, 8]);
     }
-    ctx.lineWidth = brushSize;
-    let x1 = e.clientX-canvas.offsetLeft;
-    let y1 = e.clientY - canvas.offsetTop;
-    ctx.lineTo(e.clientX-canvas.offsetLeft, e.clientY-canvas.offsetTop);
-    socket.emit('draw', {x1, y1, brushOpacity, brushSize, brushType});
 
+    ctx.lineWidth = size;
+
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
     ctx.strokeStyle = '#ffffff'
     ctx.stroke();
+    ctx.closePath();
+
+    if (emit) {
+      socket.emit('draw', { x0, y0, x1, y1, size, type, opacity });
+
+    }
   }
 
-  const handleMouseUp = ()=>{
+  const handleMouseMove = (e) => {
+
+    if (!drawing) {
+      return
+    }
+    const { offsetX, offsetY } = e.nativeEvent;
+    const x0 = lastPosRef.current.x;
+    const y0 = lastPosRef.current.y;
+
+    draw(x0, y0, offsetX, offsetY, brushSize, brushType, brushOpacity, true);
+    lastPosRef.current = { x: offsetX, y: offsetY };
+
+
+
+  }
+
+
+
+  const handleMouseUp = () => {
     setDrawing(false);
   }
 
-  const handleBrushSize = (e)=>{
+  const handleBrushSize = (e) => {
     setBrushSize(Number(e.target.value));
   }
 
-  const handleBrushType = (e)=>{
+  const handleBrushType = (e) => {
     setBrushType(e.target.value);
   }
 
-  const handleBrushOpacity = (e)=>{
-    setBrushOpacity(Number(e.target.value)/10);
+  const handleBrushOpacity = (e) => {
+    setBrushOpacity(Number(e.target.value) / 10);
   }
 
 
-  const clearCanvas = ()=>{
+  const clearCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
-  return (
-  
-  <div className='container'>
 
-   <div className='canvasActions'>
-   <div className='form-element'>
-    <label htmlFor="brushOpacity">Brush Opacity</label><input type="range" id="brushOpacity" name="brushOpacity" min="1" max="10" value={brushOpacity*10} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
+  useEffect(() => {
+    socket.on('draw', (data) => {
+      const { x0, y0, x1, y1, size, type, opacity } = data;
+      draw(x0, y0, x1, y1, size, type, opacity, false);
+    })
+  }, [socket]);
+  return (
+
+    <div className='container'>
+
+      <div className='canvasActions'>
+        <div className='form-element'>
+          <label htmlFor="brushOpacity">Brush Opacity</label><input type="range" id="brushOpacity" name="brushOpacity" min="1" max="10" value={brushOpacity * 10} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
+        </div>
+        <div className='form-element'>
+          <label htmlFor="brushSize">Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
+        </div>
+        <div className='form-element'>
+          <label htmlFor="brushType">Brush Type</label><select id="brushType" name="brushType" value={brushType} onChange={handleBrushType}> <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
+        </div>
+        <div className='form-element'>
+          <button onClick={clearCanvas}>Clear Canvas</button>
+        </div>
+      </div>
+      <canvas ref={canvasRef} width="800px" height="800px" onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} />
     </div>
-    <div className='form-element'>
-    <label htmlFor="brushSize">Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
-    </div>
-    <div className='form-element'>
-    <label htmlFor="brushType">Brush Type</label><select id="brushType" name="brushType" value={brushType} onChange={handleBrushType}> <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
-    </div>
-    <div className='form-element'>
-      <button onClick={clearCanvas}>Clear Canvas</button>
-    </div>
-    </div>
-    <canvas ref={canvasRef} width="800px" height="800px"  onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}/>
-   </div>
   )
 }
 

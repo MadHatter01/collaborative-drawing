@@ -24,7 +24,7 @@ io.on("connection", (socket)=>{
 
     socket.on('draw', (data)=>{
         io.emit('draw', data);
-        console.log(data)
+      
     })
 });
 
