@@ -1,5 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
+import { io } from 'socket.io-client';
+const socket = io('http://localhost:3001');
 
 function App() {
   const canvasRef = useRef(null);
@@ -37,8 +39,10 @@ function App() {
       ctx.setLineDash([2,8]);
     }
     ctx.lineWidth = brushSize;
-   
+    let x1 = e.clientX-canvas.offsetLeft;
+    let y1 = e.clientY - canvas.offsetTop;
     ctx.lineTo(e.clientX-canvas.offsetLeft, e.clientY-canvas.offsetTop);
+    socket.emit('draw', {x1, y1, brushOpacity, brushSize, brushType});
 
     ctx.strokeStyle = '#ffffff'
     ctx.stroke();
