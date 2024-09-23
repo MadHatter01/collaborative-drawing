@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
+import { HexColorPicker } from "react-colorful";
 import { io } from 'socket.io-client';
 const socket = io('http://localhost:3001');
 
@@ -10,6 +11,8 @@ function App() {
   const [brushType, setBrushType] = useState('solid');
   const [brushOpacity, setBrushOpacity] = useState(1);
   const lastPosRef = useRef({ x: 0, y: 0 });
+  const [brushColor, setBrushColor] = useState("#ffffff");
+
 
 
   const handleMouseDown = (e) => {
@@ -18,7 +21,7 @@ function App() {
     lastPosRef.current = { x: offsetX, y: offsetY };
   }
 
-  const draw = (x0, y0, x1, y1, size, type, opacity, emit) => {
+  const draw = (x0, y0, x1, y1, size, type, opacity, color, emit) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.globalAlpha = opacity;
@@ -37,12 +40,12 @@ function App() {
     ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.lineTo(x1, y1);
-    ctx.strokeStyle = '#ffffff'
+    ctx.strokeStyle = color;
     ctx.stroke();
     ctx.closePath();
 
     if (emit) {
-      socket.emit('draw', { x0, y0, x1, y1, size, type, opacity });
+      socket.emit('draw', { x0, y0, x1, y1, size, type, opacity, color });
 
     }
   }
@@ -56,7 +59,7 @@ function App() {
     const x0 = lastPosRef.current.x;
     const y0 = lastPosRef.current.y;
 
-    draw(x0, y0, offsetX, offsetY, brushSize, brushType, brushOpacity, true);
+    draw(x0, y0, offsetX, offsetY, brushSize, brushType, brushOpacity, brushColor, true);
     lastPosRef.current = { x: offsetX, y: offsetY };
 
 
@@ -99,8 +102,12 @@ function App() {
     <div className='container'>
 
       <div className='canvasActions'>
+
         <div className='form-element'>
           <label htmlFor="brushOpacity">Brush Opacity</label><input type="range" id="brushOpacity" name="brushOpacity" min="1" max="10" value={brushOpacity * 10} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
+        </div>
+        <div className='form-element'>
+        <HexColorPicker className='color-picker' color={brushColor} onChange={setBrushColor} />
         </div>
         <div className='form-element'>
           <label htmlFor="brushSize">Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
