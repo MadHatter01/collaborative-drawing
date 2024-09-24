@@ -88,6 +88,13 @@ function App() {
   }
 
   useEffect(() => {
+
+    socket.on('history', (history)=>{
+      history.forEach(data => {
+        const { x0, y0, x1, y1, size, type, opacity, color } = data;
+        draw(x0, y0, x1, y1, size, type, opacity, color, false);
+      });
+    })
     socket.on('draw', (data) => {
       const { x0, y0, x1, y1, size, type, opacity, color } = data;
       draw(x0, y0, x1, y1, size, type, opacity, color, false);

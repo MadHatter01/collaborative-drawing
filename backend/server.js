@@ -18,11 +18,15 @@ const io  = new Server(server,{
     }
 } );
 
+let drawingHistory = [];
 
 io.on("connection", (socket)=>{
     console.log('connected')
 
+    socket.emit('history', drawingHistory);
+
     socket.on('draw', (data)=>{
+        drawingHistory.push(data);
         io.emit('draw', data);
       
     })
