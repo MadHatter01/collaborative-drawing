@@ -61,11 +61,7 @@ function App() {
 
     draw(x0, y0, offsetX, offsetY, brushSize, brushType, brushOpacity, brushColor, true);
     lastPosRef.current = { x: offsetX, y: offsetY };
-
-
-
   }
-
 
 
   const handleMouseUp = () => {
@@ -93,8 +89,8 @@ function App() {
 
   useEffect(() => {
     socket.on('draw', (data) => {
-      const { x0, y0, x1, y1, size, type, opacity } = data;
-      draw(x0, y0, x1, y1, size, type, opacity, false);
+      const { x0, y0, x1, y1, size, type, opacity, color } = data;
+      draw(x0, y0, x1, y1, size, type, opacity, color, false);
     })
   }, [socket]);
   return (
