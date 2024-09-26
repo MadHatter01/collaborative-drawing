@@ -29,7 +29,13 @@ io.on("connection", (socket)=>{
         drawingHistory.push(data);
         io.emit('draw', data);
       
-    })
+    });
+
+    socket.on('clearCanvas', ()=>{
+        console.log('clearing')
+        drawingHistory = [];
+        io.emit('clearCanvas');
+    });
 });
 
 server.listen(3001, ()=>{

@@ -85,6 +85,8 @@ function App() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    socket.emit('clearCanvas');
   }
 
   useEffect(() => {
@@ -98,7 +100,19 @@ function App() {
     socket.on('draw', (data) => {
       const { x0, y0, x1, y1, size, type, opacity, color } = data;
       draw(x0, y0, x1, y1, size, type, opacity, color, false);
+    });
+
+    socket.on('clearCanvas', ()=>{
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     })
+
+    return () => {
+      socket.off('history');
+      socket.off('draw');
+      socket.off('clearCanvas');
+    };
   }, [socket]);
   return (
 
