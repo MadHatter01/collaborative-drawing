@@ -13,6 +13,8 @@ function App() {
   const lastPosRef = useRef({ x: 0, y: 0 });
   const [brushColor, setBrushColor] = useState("#ffffff");
 
+  const [room, setRoom] = useState("");
+
 
 
   const handleMouseDown = (e) => {
@@ -80,6 +82,9 @@ function App() {
     setBrushOpacity(Number(e.target.value) / 10);
   }
 
+  const joinRoom = ()=>{
+    socket.emit('joinRoom', room);
+  }
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
@@ -117,6 +122,10 @@ function App() {
   return (
 
     <div className='container'>
+
+      <div className='room-selection'>
+        <input type="text" placeholder="Enter room name" value={room} onChange={(e)=>setRoom(e.target.value)} /> <button onClick={joinRoom}>Join Room</button>
+      </div>
 
       <div className='canvasActions'>
 

@@ -25,6 +25,11 @@ io.on("connection", (socket)=>{
 
     socket.emit('history', drawingHistory);
 
+    socket.on('joinRoom', (room)=>{
+        socket.join(room);
+        console.log(`user joined ${room}`);
+    })
+
     socket.on('draw', (data)=>{
         drawingHistory.push(data);
         io.emit('draw', data);
