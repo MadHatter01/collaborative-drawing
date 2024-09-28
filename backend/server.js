@@ -31,8 +31,10 @@ io.on("connection", (socket)=>{
     })
 
     socket.on('draw', (data)=>{
+        const {room, ...drawData} = data;
+        socket.to(room).emit('draw', drawData)
         drawingHistory.push(data);
-        io.emit('draw', data);
+        // io.emit('draw', data);
       
     });
 

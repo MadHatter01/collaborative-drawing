@@ -47,7 +47,7 @@ function App() {
     ctx.closePath();
 
     if (emit) {
-      socket.emit('draw', { x0, y0, x1, y1, size, type, opacity, color });
+      socket.emit('draw', { room, x0, y0, x1, y1, size, type, opacity, color });
 
     }
   }
