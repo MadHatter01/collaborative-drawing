@@ -14,6 +14,7 @@ function App() {
   const [brushColor, setBrushColor] = useState("#ffffff");
 
   const [room, setRoom] = useState("");
+  const [inRoom, setInRoom] = useState(false);
 
 
 
@@ -82,8 +83,9 @@ function App() {
     setBrushOpacity(Number(e.target.value) / 10);
   }
 
-  const joinRoom = ()=>{
+  const joinRoom = () => {
     socket.emit('joinRoom', room);
+    setInRoom(true);
   }
 
   const clearCanvas = () => {
@@ -96,7 +98,7 @@ function App() {
 
   useEffect(() => {
 
-    socket.on('history', (history)=>{
+    socket.on('history', (history) => {
       history.forEach(data => {
         const { x0, y0, x1, y1, size, type, opacity, color } = data;
         draw(x0, y0, x1, y1, size, type, opacity, color, false);
@@ -107,7 +109,7 @@ function App() {
       draw(x0, y0, x1, y1, size, type, opacity, color, false);
     });
 
-    socket.on('clearCanvas', ()=>{
+    socket.on('clearCanvas', () => {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -122,30 +124,34 @@ function App() {
   return (
 
     <div className='container'>
+      {!inRoom ?  (<div className='room-selection'>
+        <input type="text" placeholder="Enter room name" value={room} onChange={(e) => setRoom(e.target.value)} /> <button onClick={joinRoom}>Join Room</button>
+      </div>):(
 
-      <div className='room-selection'>
-        <input type="text" placeholder="Enter room name" value={room} onChange={(e)=>setRoom(e.target.value)} /> <button onClick={joinRoom}>Join Room</button>
+
+
+      <div className='drawingBoard'>
+        <div className='canvasActions'>
+
+          <div className='form-element'>
+            <label htmlFor="brushOpacity">Brush Opacity</label><input type="range" id="brushOpacity" name="brushOpacity" min="1" max="10" value={brushOpacity * 10} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
+          </div>
+          <div className='form-element'>
+            <HexColorPicker className='color-picker' color={brushColor} onChange={setBrushColor} />
+          </div>
+          <div className='form-element'>
+            <label htmlFor="brushSize">Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
+          </div>
+          <div className='form-element'>
+            <label htmlFor="brushType">Brush Type</label><select id="brushType" name="brushType" value={brushType} onChange={handleBrushType}> <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
+          </div>
+          <div className='form-element'>
+            <button onClick={clearCanvas}>Clear Canvas</button>
+          </div>
+        </div>
+        <canvas ref={canvasRef} width="800px" height="800px" onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} />
       </div>
-
-      <div className='canvasActions'>
-
-        <div className='form-element'>
-          <label htmlFor="brushOpacity">Brush Opacity</label><input type="range" id="brushOpacity" name="brushOpacity" min="1" max="10" value={brushOpacity * 10} onChange={handleBrushOpacity} /><span>{brushOpacity}</span>
-        </div>
-        <div className='form-element'>
-        <HexColorPicker className='color-picker' color={brushColor} onChange={setBrushColor} />
-        </div>
-        <div className='form-element'>
-          <label htmlFor="brushSize">Brush Size</label><input type="range" id="brushSize" name="brushSize" min="1" max="50" value={brushSize} onChange={handleBrushSize} /><span>{brushSize}</span>
-        </div>
-        <div className='form-element'>
-          <label htmlFor="brushType">Brush Type</label><select id="brushType" name="brushType" value={brushType} onChange={handleBrushType}> <option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select>
-        </div>
-        <div className='form-element'>
-          <button onClick={clearCanvas}>Clear Canvas</button>
-        </div>
-      </div>
-      <canvas ref={canvasRef} width="800px" height="800px" onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} />
+      )}
     </div>
   )
 }
