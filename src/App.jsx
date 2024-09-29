@@ -15,7 +15,8 @@ function App() {
 
   const [room, setRoom] = useState("");
   const [inRoom, setInRoom] = useState(false);
-
+  const [serverOnline, setServerOnline] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
 
   const handleMouseDown = (e) => {
@@ -98,6 +99,11 @@ function App() {
 
   useEffect(() => {
 
+    socket.on('connect_error', ()=>{
+      setServerOnline(false);
+      setErrorMessage("I wish I had infinite money, but sadly, I don’t! 💸 The server’s offline for now, but please check back later!");
+    })
+
     socket.on('history', (history) => {
       history.forEach(data => {
         const { x0, y0, x1, y1, size, type, opacity, color } = data;
@@ -121,9 +127,15 @@ function App() {
       socket.off('clearCanvas');
     };
   }, [socket]);
+
+      
+
   return (
+    
 
     <div className='container'>
+  {!serverOnline ? ( <div className='error-message'>{errorMessage}</div>):(<>
+
       {!inRoom ?  (<div className='room-selection'>
         <input type="text" placeholder="Enter room name" value={room} onChange={(e) => setRoom(e.target.value)} /> <button onClick={joinRoom}>Join Room</button>
       </div>):(
@@ -152,6 +164,7 @@ function App() {
         <canvas ref={canvasRef} width="800px" height="800px" onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} />
       </div>
       )}
+      </>)}
     </div>
   )
 }
