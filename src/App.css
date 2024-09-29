@@ -24,3 +24,14 @@ canvas{
   border: 1px solid #555;
 }
 
+.roomSelection input{
+  padding:0.5rem;
+  border-radius: 0.2rem;
+  border:none;
+
+}
+
+.roomSelection{
+display:flex;
+gap:1rem;
+}

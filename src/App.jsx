@@ -136,7 +136,7 @@ function App() {
     <div className='container'>
   {!serverOnline ? ( <div className='error-message'>{errorMessage}</div>):(<>
 
-      {!inRoom ?  (<div className='room-selection'>
+      {!inRoom ?  (<div className='roomSelection'>
         <input type="text" placeholder="Enter room name" value={room} onChange={(e) => setRoom(e.target.value)} /> <button onClick={joinRoom}>Join Room</button>
       </div>):(
 
