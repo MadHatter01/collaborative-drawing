@@ -145,6 +145,7 @@ function App() {
 
 
       <div className='drawingBoard'>
+      <p>Room: {room}</p>
         <div className='canvasActions'>
 
           <div className='form-element'>
