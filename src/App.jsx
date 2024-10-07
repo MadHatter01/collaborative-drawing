@@ -20,7 +20,7 @@ function App() {
   const [serverOnline, setServerOnline] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const rooms = new Set([])
+  const [rooms, setRooms] = useState(new Set());
 
 
   const handleMouseDown = (e) => {
@@ -90,8 +90,9 @@ function App() {
 
   const joinRoom = () => {
     socket.emit('joinRoom', room);
-    rooms.add(room);
-    console.log('rooms',rooms)
+    setRooms(prevRooms => new Set([...prevRooms, room]))
+
+    console.log(rooms)
     setInRoom(true);
   }
 
