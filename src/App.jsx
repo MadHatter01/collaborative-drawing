@@ -20,8 +20,7 @@ function App() {
   const [serverOnline, setServerOnline] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [rooms, setRooms] = useState(new Set());
-
+  const [availableRooms, setAvailableRooms] = useState([]);
 
   const handleMouseDown = (e) => {
     setDrawing(true);
@@ -90,9 +89,8 @@ function App() {
 
   const joinRoom = () => {
     socket.emit('joinRoom', room);
-    setRooms(prevRooms => new Set([...prevRooms, room]))
+    // setRooms(prevRooms => new Set([...prevRooms, room]))
 
-    console.log(rooms)
     setInRoom(true);
   }
 
@@ -116,7 +114,14 @@ function App() {
         const { x0, y0, x1, y1, size, type, opacity, color } = data;
         draw(x0, y0, x1, y1, size, type, opacity, color, false);
       });
-    })
+    });
+
+    socket.on('activeRooms', (activeRooms)=>{
+      setAvailableRooms(activeRooms);
+
+    });
+
+    socket.emit('getRooms');
     socket.on('draw', (data) => {
       const { x0, y0, x1, y1, size, type, opacity, color } = data;
       draw(x0, y0, x1, y1, size, type, opacity, color, false);
@@ -145,6 +150,14 @@ function App() {
 
       {!inRoom ?  (<div className='roomSelection'>
         <input type="text" placeholder="Enter room name" value={room} onChange={(e) => setRoom(e.target.value)} /> <button onClick={joinRoom}>Join Room</button>
+        <h3>Available Rooms</h3>
+        <ul>
+          {availableRooms.map((roomName, index)=>{
+            <li key={index}>
+              {roomName}
+            </li>
+          })}
+        </ul>
       </div>):(
 
 
