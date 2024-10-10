@@ -119,6 +119,7 @@ function App() {
     socket.on('activeRooms', (activeRooms)=>{
       setAvailableRooms(activeRooms);
 
+
     });
 
     socket.emit('getRooms');
@@ -152,11 +153,11 @@ function App() {
         <input type="text" placeholder="Enter room name" value={room} onChange={(e) => setRoom(e.target.value)} /> <button onClick={joinRoom}>Join Room</button>
         <h3>Available Rooms</h3>
         <ul>
-          {availableRooms.map((roomName, index)=>{
+          {availableRooms.map((roomName, index)=>(
             <li key={index}>
               {roomName}
             </li>
-          })}
+          ))}
         </ul>
       </div>):(
 
